@@ -1,0 +1,40 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+keys.txt
+*.key
+*.pem
+*credentials*
+*license*.json
+
+# Runtime data
+configs/
+data/
+cache/
+downloads/
+logs/
+backups/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite*
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editors and operating systems
+*.swp
+*.kate-swp
+*~
+.DS_Store
+Thumbs.db
+
+# Archives
+*.zip
+*.tar
+*.tar.gz

@@ -1,0 +1,74 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    ports:
+      - "${JELLYFIN_PORT}:8096"
+    volumes:
+      - "${CONFIG_ROOT}/jellyfin:/config"
+      - "${MEDIA_ROOT}:/media:ro"
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    environment: &linuxserver-env
+      PUID: "${PUID}"
+      PGID: "${PGID}"
+      TZ: "${TZ}"
+    ports:
+      - "${QBITTORRENT_PORT}:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    volumes:
+      - "${CONFIG_ROOT}/qbittorrent:/config"
+      - "${DOWNLOADS_ROOT}:/downloads"
+      - "${INCOMPLETE_ROOT}:/incomplete"
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    environment: *linuxserver-env
+    ports:
+      - "${SONARR_PORT}:8989"
+    volumes:
+      - "${CONFIG_ROOT}/sonarr:/config"
+      - "${MEDIA_ROOT}:/media"
+      - "${DOWNLOADS_ROOT}:/downloads"
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    environment: *linuxserver-env
+    ports:
+      - "${RADARR_PORT}:7878"
+    volumes:
+      - "${CONFIG_ROOT}/radarr:/config"
+      - "${MEDIA_ROOT}:/media"
+      - "${DOWNLOADS_ROOT}:/downloads"
+    restart: unless-stopped
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    environment: *linuxserver-env
+    ports:
+      - "${JACKETT_PORT}:9117"
+    volumes:
+      - "${CONFIG_ROOT}/jackett:/config"
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    environment: *linuxserver-env
+    ports:
+      - "${BAZARR_PORT}:6767"
+    volumes:
+      - "${CONFIG_ROOT}/bazarr:/config"
+      - "${MEDIA_ROOT}:/media"
+    restart: unless-stopped
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    environment:
+      TZ: "${TZ}"
+    ports:
+      - "${FLARESOLVERR_PORT}:8191"
+    restart: unless-stopped
