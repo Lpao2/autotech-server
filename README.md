@@ -6,6 +6,8 @@ Autotech Server combines containerized media services, automated content organiz
 
 > This repository is a sanitized portfolio edition. Production configuration, credentials, customer data, licensing infrastructure, and the complete commercial installer are intentionally excluded.
 
+![Autotech Server architecture](docs/images/autotech-server-architecture.png)
+
 ## Architecture
 
 ```mermaid
