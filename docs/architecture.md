@@ -32,8 +32,8 @@ Provider availability and terms can change. Any deployment must respect the rele
 
 ## Deployment targets
 
-- **Ubuntu Server:** primary and validated target.
-- **Windows with WSL2:** experimental bootstrap path.
+- **Ubuntu Server:** validated target with a native Bash installation flow and `systemd` services.
+- **Windows:** maintained target with a dedicated PowerShell installation flow and Windows service integration.
 - **Other Linux distributions:** possible, but not covered by the private installer validation.
 
 ## Boundaries of the public edition

@@ -1,8 +1,8 @@
 # Autotech Server
 
-Automated deployment platform for a self-hosted Linux media server.
+Automated deployment platform for a self-hosted media server.
 
-Autotech Server combines containerized media services, automated content organization, subtitle management, custom Jellyfin branding, and a manga ingestion pipeline in one reproducible architecture. The project began as a home-server deployment and evolved into a Linux-first installation platform with an experimental Windows/WSL2 bootstrapper.
+Autotech Server combines containerized media services, automated content organization, subtitle management, custom Jellyfin branding, and a manga ingestion pipeline in one reproducible architecture. The project began as a home-server deployment and evolved into an installation platform with dedicated Linux and Windows implementations.
 
 > This repository is a sanitized portfolio edition. Production configuration, credentials, customer data, licensing infrastructure, and the complete commercial installer are intentionally excluded.
 
@@ -47,7 +47,17 @@ The download clients use fast SSD staging directories, while imported and organi
 - Python manga workflow with multiple provider adapters
 - CBZ chapter generation, cover artwork, and metadata management
 - `systemd` services for local APIs and scheduled updates
-- Experimental PowerShell bootstrapper for WSL2 environments
+- Dedicated Bash and PowerShell installation flows
+- Cross-platform validation suite for Linux and Windows behavior
+
+## Platform support
+
+| Platform | Private installer | Public edition |
+| --- | --- | --- |
+| Ubuntu Server | Validated deployment target | Architecture and Compose example |
+| Windows | Dedicated installer and services | Architecture documentation only |
+
+The production installers are maintained in a private repository because they include deployment-specific automation. This repository documents the design without publishing credentials, customer data, licensing components, or operational defaults.
 
 ## Repository contents
 
@@ -92,7 +102,7 @@ See [the security review](docs/security-review.md) for the publication checklist
 
 ## Status
 
-The Linux media pipeline has been validated end to end. The Windows/WSL2 path remains an experimental prototype, and the public repository intentionally contains only a demonstrative Compose configuration.
+The current private release line is `4.4.x`, with maintained Linux and Windows source trees. The public repository intentionally contains only a demonstrative Compose configuration and sanitized architecture documentation; it is not a downloadable production installer.
 
 ## Author
 
