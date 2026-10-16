@@ -1,28 +1,43 @@
 # Autotech Server
 
-**Autotech Server is a cross-platform, self-hosted media automation platform for Windows and Linux.** It discovers, selects, downloads, imports, renames, organizes, enriches, subtitles, and presents movies, series, anime, and manga through Jellyfin while hiding the underlying service complexity from the user.
+**A cross-platform, self-hosted media automation platform for Windows and Linux.**
 
-🌐 **Website:** [autotech.gripe](https://autotech.gripe)
+Autotech turns a collection of specialized media services into one cohesive product. Users can discover, select, download, import, rename, organize, enrich, subtitle, and browse movies, series, anime, and manga through a customized Jellyfin experience.
 
-## Current production releases
+🌐 **Product:** [api.autotech.gripe](https://api.autotech.gripe)
 
-| Platform | Release |
-| --- | --- |
+## Why this project matters
+
+Autotech is a practical example of product engineering across the full stack:
+
+- a user-facing experience built on top of Jellyfin;
+- Python APIs and media-processing workflows;
+- integrations with multiple third-party services;
+- Windows and Linux installation and service layers;
+- storage, permissions, update, and recovery concerns;
+- release engineering for a real cross-platform product.
+
+The difficult part is not deploying Radarr, Sonarr, or qBittorrent separately. The difficult part is coordinating their different APIs, states, filesystems, failure modes, and user workflows as one reliable system.
+
+## Production status
+
+| Platform | Current production release |
+| --- | ---: |
 | Windows | **5.0.0** |
 | Linux | **5.0.1** |
 
-Both platforms are production targets. This public repository is a sanitized technical portfolio and architecture reference; commercial installers, operational defaults, and private implementation details remain outside it.
+Windows and Linux are production targets. This repository is the sanitized public portfolio edition; commercial installers, customer data, operational defaults, and sensitive implementation details remain private.
 
-## What Autotech manages
+## Supported content workflows
 
-| Content | Discovery | Download | Organization | Metadata / covers | Subtitles | Library |
+| Content | Discovery | Download | Organization | Metadata and artwork | Subtitles | Library |
 | --- | --- | --- | --- | --- | --- | --- |
-| Movies | Discover | Radarr + qBittorrent | Automatic import and naming | Metadata and artwork | Bazarr | Jellyfin |
-| Series | Discover | Sonarr + qBittorrent | Import and organization | Metadata and artwork | Bazarr | Jellyfin |
-| Anime | Discover | Sonarr + qBittorrent | Dedicated library workflow | Metadata and artwork | Subtitle workflow | Jellyfin |
-| Manga | Discover | Autotech Python pipeline | Chapters and CBZ | Covers and metadata | — | Jellyfin |
+| Movies | Autotech Discover | Radarr + qBittorrent | Import, rename, organize | Metadata and covers | Bazarr | Jellyfin |
+| Series | Autotech Discover | Sonarr + qBittorrent | Import, rename, organize | Metadata and covers | Bazarr | Jellyfin |
+| Anime | Autotech Discover | Sonarr + qBittorrent | Dedicated library workflow | Metadata and covers | Subtitle workflow | Jellyfin |
+| Manga | Autotech Discover | Custom Python pipeline | Chapters and CBZ | Covers and metadata | — | Jellyfin |
 
-The engineering challenge is not running each service in isolation. Autotech coordinates different discovery, download, import, storage, metadata, and refresh workflows as one product.
+Autotech coordinates discovery, download, import, storage, metadata, subtitles, and library refresh as a unified lifecycle.
 
 ## Architecture
 
@@ -40,29 +55,52 @@ flowchart TD
     O --> B[Bazarr]
     O --> J[Jellyfin libraries]
     P --> C[CBZ, covers, metadata] --> J
+    L[Licensing, updater, support] -. platform services .-> UI
 ```
 
-See [the architecture notes](docs/architecture.md) for storage, service boundaries, and public-edition limits.
+See [the architecture notes](docs/architecture.md) and [the capabilities overview](docs/capabilities.md).
 
-## Product and engineering capabilities
+## Engineering scope
 
-- Customized Jellyfin experience with Autotech identity, navigation, Discover, Downloads, onboarding, support, libraries, custom covers, and PT-BR / EN internationalization.
-- Python backend services, local APIs, provider integrations, discovery, media pipelines, storage management, and update coordination.
-- Docker Compose, systemd, Linux services, Windows services, persistence, filesystem layout, networking, and automation.
-- Release engineering with platform-specific versioning, manifests, cryptographic signatures, SHA-256 verification, smoke tests, checkpoints, rollback, and updater workflows.
-- Product infrastructure for licensing, activation, subscriptions, Stripe integration, support, and separate Windows/Linux installers. Sensitive implementations are intentionally not published here.
+### Product and user experience
+
+- Deep Jellyfin customization with Autotech visual identity.
+- Custom navigation, Discover, Downloads, onboarding, support, and library experiences.
+- Custom artwork and covers with PT-BR / EN internationalization.
+
+### Backend and integrations
+
+- Python services and local APIs.
+- Provider abstraction, discovery, title resolution, download orchestration, import, and media processing.
+- Storage management, filesystem boundaries, metadata, subtitles, and Jellyfin refresh workflows.
+
+### Platform and infrastructure
+
+- Windows and Linux installers and service integration.
+- Docker Compose, systemd, persistence, networking, permissions, and update coordination.
+- Clear separation between download staging and organized media libraries.
+
+### Release engineering
+
+- Independent platform versioning and release manifests.
+- Cryptographic signatures and SHA-256 verification.
+- Smoke tests, checkpoints, rollback procedures, and updater workflows.
+
+### Product infrastructure
+
+The wider private product includes licensing, activation, subscriptions, Stripe integration, support, and platform-specific release infrastructure. This public repository documents the architecture without exposing sensitive implementations.
 
 ## Custom manga platform
 
-The manga subsystem is a first-party Python workflow rather than a thin service wrapper. Its public architecture covers provider abstraction, search and discovery, title resolution, chapter handling, multi-source retrieval, normalization, CBZ packaging, cover and metadata generation, periodic updates, storage, Jellyfin refresh, and a local API. Exact provider behavior and deployment secrets are kept out of this repository.
+The manga subsystem is a first-party Python workflow, not just a wrapper around another service. It includes provider abstraction, search and discovery, title resolution, chapter handling, multi-source retrieval, normalization, CBZ packaging, cover and metadata generation, periodic updates, storage, Jellyfin refresh, and a local API.
 
-## Public repository and security
+## Repository boundaries and security
 
-This repository contains documentation, examples, and sanitized assets—not commercial executables, release archives, production databases, customer or license data, Stripe secrets, API keys, tokens, private signing keys, cookies, logs, backups, or real `.env` files. See [the security review](docs/security-review.md).
+This public edition contains documentation, examples, and sanitized assets. It intentionally excludes commercial executables and installers, release archives, production databases, customer or license data, Stripe secrets, API keys, tokens, private signing keys, cookies, logs, backups, and real environment files.
 
 ## Project status
 
-The public edition is a portfolio and architectural reference. Production builds are derived from private, platform-specific sources and are not published here.
+Production source is maintained in private platform-specific repositories. This repository is designed for architectural review, technical discussion, and portfolio evaluation—not as a downloadable production installer.
 
 ## Author
 
@@ -70,4 +108,4 @@ Developed by **Lucas Patrocínio**, Electronic Engineering student at the Federa
 
 ## License
 
-The sanitized examples and documentation are available under the [MIT License](LICENSE). Third-party services and assets retain their respective licenses.
+Sanitized examples and documentation are available under the [MIT License](LICENSE). Third-party services and assets retain their respective licenses.
