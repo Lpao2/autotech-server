@@ -1,108 +1,68 @@
 # Autotech Server
 
-Automated deployment platform for a self-hosted media server.
+**Autotech Server is a cross-platform, self-hosted media automation platform for Windows and Linux.** It discovers, selects, downloads, imports, renames, organizes, enriches, subtitles, and presents movies, series, anime, and manga through Jellyfin while hiding the underlying service complexity from the user.
 
-Autotech Server combines containerized media services, automated content organization, subtitle management, custom Jellyfin branding, and a manga ingestion pipeline in one reproducible architecture. The project began as a home-server deployment and evolved into an installation platform with dedicated Linux and Windows implementations.
+🌐 **Website:** [autotech.gripe](https://autotech.gripe)
 
-> This repository is a sanitized portfolio edition. Production configuration, credentials, customer data, licensing infrastructure, and the complete commercial installer are intentionally excluded.
+## Current production releases
 
-![Autotech Server architecture](docs/images/autotech-server-architecture.png)
+| Platform | Release |
+| --- | --- |
+| Windows | **5.0.0** |
+| Linux | **5.0.1** |
+
+Both platforms are production targets. This public repository is a sanitized technical portfolio and architecture reference; commercial installers, operational defaults, and private implementation details remain outside it.
+
+## What Autotech manages
+
+| Content | Discovery | Download | Organization | Metadata / covers | Subtitles | Library |
+| --- | --- | --- | --- | --- | --- | --- |
+| Movies | Discover | Radarr + qBittorrent | Automatic import and naming | Metadata and artwork | Bazarr | Jellyfin |
+| Series | Discover | Sonarr + qBittorrent | Import and organization | Metadata and artwork | Bazarr | Jellyfin |
+| Anime | Discover | Sonarr + qBittorrent | Dedicated library workflow | Metadata and artwork | Subtitle workflow | Jellyfin |
+| Manga | Discover | Autotech Python pipeline | Chapters and CBZ | Covers and metadata | — | Jellyfin |
+
+The engineering challenge is not running each service in isolation. Autotech coordinates different discovery, download, import, storage, metadata, and refresh workflows as one product.
 
 ## Architecture
 
 ```mermaid
 flowchart TD
-    R[Sonarr / Radarr] --> J[Jackett]
-    J --> Q[qBittorrent]
-    Q --> S[SSD staging]
-    S --> M[Media library]
-    M --> F[Jellyfin]
-    B[Bazarr] --> M
-    A[Manga API + scraper] --> G[Manga library]
-    G --> F
+    U[User] --> UI[Autotech / customized Jellyfin UI]
+    UI --> D[Unified Discover]
+    D --> M[Movies] --> R[Radarr]
+    D --> S[Series] --> N[Sonarr]
+    D --> A[Anime] --> N
+    D --> G[Manga] --> P[Autotech manga pipeline / API]
+    R --> I[Indexers: Jackett / FlareSolverr]
+    N --> I
+    I --> Q[qBittorrent] --> T[Staging storage] --> O[Organized media]
+    O --> B[Bazarr]
+    O --> J[Jellyfin libraries]
+    P --> C[CBZ, covers, metadata] --> J
 ```
 
-The download clients use fast SSD staging directories, while imported and organized media is stored in the final library. Jellyfin reads only the organized library, and Bazarr manages subtitles after import. A separate Python service handles manga discovery, chapter packaging, cover generation, and library refreshes.
+See [the architecture notes](docs/architecture.md) for storage, service boundaries, and public-edition limits.
 
-## Core services
+## Product and engineering capabilities
 
-| Service | Role | Default port |
-| --- | --- | ---: |
-| Jellyfin | Media server and customized user interface | `8096` |
-| Sonarr | Series and anime library automation | `8989` |
-| Radarr | Movie library automation | `7878` |
-| Jackett | Indexer integration layer | `9117` |
-| qBittorrent | Download client and SSD staging | `8080` |
-| Bazarr | Automated subtitle management | `6767` |
-| FlareSolverr | Compatibility layer for supported sources | `8191` |
-| Manga API | Local management API for manga workflows | `5555` |
+- Customized Jellyfin experience with Autotech identity, navigation, Discover, Downloads, onboarding, support, libraries, custom covers, and PT-BR / EN internationalization.
+- Python backend services, local APIs, provider integrations, discovery, media pipelines, storage management, and update coordination.
+- Docker Compose, systemd, Linux services, Windows services, persistence, filesystem layout, networking, and automation.
+- Release engineering with platform-specific versioning, manifests, cryptographic signatures, SHA-256 verification, smoke tests, checkpoints, rollback, and updater workflows.
+- Product infrastructure for licensing, activation, subscriptions, Stripe integration, support, and separate Windows/Linux installers. Sensitive implementations are intentionally not published here.
 
-## Highlights
+## Custom manga platform
 
-- Docker Compose deployment on Ubuntu Server
-- Repeatable media, cache, and service directory layout
-- Automated Sonarr/Radarr to qBittorrent import pipeline
-- SSD staging with final media storage separated from downloads
-- Jellyfin branding and custom interface extensions
-- Python manga workflow with multiple provider adapters
-- CBZ chapter generation, cover artwork, and metadata management
-- `systemd` services for local APIs and scheduled updates
-- Dedicated Bash and PowerShell installation flows
-- Cross-platform validation suite for Linux and Windows behavior
+The manga subsystem is a first-party Python workflow rather than a thin service wrapper. Its public architecture covers provider abstraction, search and discovery, title resolution, chapter handling, multi-source retrieval, normalization, CBZ packaging, cover and metadata generation, periodic updates, storage, Jellyfin refresh, and a local API. Exact provider behavior and deployment secrets are kept out of this repository.
 
-## Platform support
+## Public repository and security
 
-| Platform | Private installer | Public edition |
-| --- | --- | --- |
-| Ubuntu Server | Validated deployment target | Architecture and Compose example |
-| Windows | Dedicated installer and services | Architecture documentation only |
+This repository contains documentation, examples, and sanitized assets—not commercial executables, release archives, production databases, customer or license data, Stripe secrets, API keys, tokens, private signing keys, cookies, logs, backups, or real `.env` files. See [the security review](docs/security-review.md).
 
-The production installers are maintained in a private repository because they include deployment-specific automation. This repository documents the design without publishing credentials, customer data, licensing components, or operational defaults.
+## Project status
 
-## Repository contents
-
-```text
-autotech-server/
-├── docs/
-│   ├── architecture.md
-│   └── security-review.md
-├── examples/
-│   ├── .env.example
-│   └── docker-compose.example.yml
-├── assets/
-│   └── autotech-logo.svg
-├── .gitignore
-├── LICENSE
-└── README.md
-```
-
-The files under `examples/` document the public architecture without exposing production defaults or the private deployment logic.
-
-## Quick start (architecture demo)
-
-This public example is intended for study and local experimentation, not as the production installer.
-
-```bash
-cp examples/.env.example .env
-docker compose --env-file .env -f examples/docker-compose.example.yml config
-docker compose --env-file .env -f examples/docker-compose.example.yml up -d
-```
-
-Create the host directories referenced in `.env` before starting the stack. Each service still requires its normal first-run configuration.
-
-## Security model
-
-- Secrets are supplied through environment variables or secret files.
-- Real service databases and configuration directories are never committed.
-- The local management API should not be exposed directly to the internet.
-- Destructive installation operations require explicit confirmation in production tooling.
-- Credentials found during the public-review process were removed from this edition and must be rotated in the private environment.
-
-See [the security review](docs/security-review.md) for the publication checklist.
-
-## Status
-
-The current private release line is `4.4.x`, with maintained Linux and Windows source trees. The public repository intentionally contains only a demonstrative Compose configuration and sanitized architecture documentation; it is not a downloadable production installer.
+The public edition is a portfolio and architectural reference. Production builds are derived from private, platform-specific sources and are not published here.
 
 ## Author
 
@@ -110,4 +70,4 @@ Developed by **Lucas Patrocínio**, Electronic Engineering student at the Federa
 
 ## License
 
-The sanitized examples and documentation in this repository are available under the [MIT License](LICENSE). Third-party services and images retain their respective licenses.
+The sanitized examples and documentation are available under the [MIT License](LICENSE). Third-party services and assets retain their respective licenses.

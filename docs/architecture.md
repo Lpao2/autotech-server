@@ -1,41 +1,42 @@
-# Architecture notes
+# Autotech Server architecture
 
-## Storage layout
+Autotech is a production cross-platform platform: Windows 5.0.0 and Linux 5.0.1. The public repository documents the interfaces and responsibilities without exposing the commercial installer or operational secrets.
 
-The deployment separates transient downloads from organized media:
+## Conceptual flow
 
-| Host path | Purpose |
-| --- | --- |
-| `/cache_downloads` | Completed download staging on SSD |
-| `/cache_downloads_incomplete` | Incomplete download staging on SSD |
-| `/srv/midias/filmes` | Final movie library |
-| `/srv/midias/series` | Final series library |
-| `/srv/midias/animes` | Final anime library |
-| `/srv/midias/mangas` | Final manga library |
-| `/srv/docker/<service>/config` | Persistent container configuration |
+```mermaid
+flowchart TD
+    U[User] --> UI[Autotech / Jellyfin UI] --> D[Unified Discover]
+    D --> MOV[Movies] --> RAD[Radarr]
+    D --> SER[Series] --> SON[Sonarr]
+    D --> ANI[Anime] --> SON
+    D --> MAN[Manga] --> API[Autotech Manga API / pipeline]
+    RAD --> IDX[Indexers: Jackett and FlareSolverr]
+    SON --> IDX --> QB[qBittorrent] --> ST[Download staging] --> ORG[Organized media storage]
+    ORG --> BAZ[Bazarr]
+    ORG --> JF[Jellyfin]
+    API --> CBZ[CBZ, covers, metadata] --> JF
+    LIC[Licensing and subscriptions] -.-> UI
+    UPD[Update infrastructure] -.-> UI
+    SUP[Support infrastructure] -.-> UI
+```
 
-These paths are configurable in the public Compose example through `.env`.
+## Components
 
-## Media workflow
+- **Autotech layer:** unified discovery, onboarding, local APIs, storage orchestration, product UI extensions, licensing, updater, and support integration.
+- **Discover:** one user-facing entry point that routes movies, series, anime, and manga to the appropriate workflow.
+- **Servarr and download services:** Radarr handles movies; Sonarr handles series and anime; Jackett and FlareSolverr support indexer integration; qBittorrent performs downloads.
+- **Manga subsystem:** a custom Python pipeline and local Manga API for providers, discovery, chapter retrieval, normalization, CBZ creation, covers, metadata, and Jellyfin refresh.
+- **Library services:** organized media is processed by Bazarr where applicable and indexed by Jellyfin.
 
-1. Sonarr or Radarr requests a release through the configured indexer integration.
-2. qBittorrent downloads the content into SSD staging.
-3. Sonarr or Radarr imports, renames, and organizes the completed content.
-4. Bazarr searches for subtitles against the final library.
-5. Jellyfin indexes the organized files and exposes them to clients.
+## Storage and lifecycle
 
-## Manga workflow
+Downloads use staging storage, while imported content is placed in organized libraries for Jellyfin. The separation supports predictable imports, filesystem permissions, cleanup boundaries, and recovery checkpoints. Exact production paths are deployment-specific and are not part of this public edition.
 
-The manga subsystem is a separate Python application composed of provider adapters, an update worker, cover generation, and a local management API. Chapters are normalized into CBZ archives and stored in a Jellyfin-visible library.
+## Platform targets
 
-Provider availability and terms can change. Any deployment must respect the relevant source's terms, copyright, and local law.
+Windows and Linux are supported production targets. The platform-specific installers and service integration are maintained privately; this repository exposes the architecture, examples, and sanitized documentation.
 
-## Deployment targets
+## Operational boundaries
 
-- **Ubuntu Server:** validated target with a native Bash installation flow and `systemd` services.
-- **Windows:** maintained target with a dedicated PowerShell installation flow and Windows service integration.
-- **Other Linux distributions:** possible, but not covered by the private installer validation.
-
-## Boundaries of the public edition
-
-The public repository demonstrates system design and deployment structure. It excludes service databases, production configuration, credentials, licensing code, customer-specific settings, and private automation used by the complete installer.
+Licensing, activation, subscriptions, update manifests, signatures, SHA-256 verification, smoke tests, rollback, and support are Autotech platform concerns. Their existence is documented here, but credentials, signing material, customer data, production databases, and commercial installer code are excluded.
