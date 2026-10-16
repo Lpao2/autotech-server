@@ -30,9 +30,9 @@ The project began as a media-server deployment and evolved into a cross-platform
 ## Preview
 
 <div align="center">
-  <img src="docs/screenshots/home-libraries.png" width="32%" alt="Autotech home with Anime, Movies, Manga, and TV Series libraries">
-  <img src="docs/screenshots/discover.png" width="32%" alt="Autotech Discover interface with filters and content results">
-  <img src="docs/screenshots/media-detail.png" width="32%" alt="Customized Jellyfin media detail experience">
+  <img src="docs/screenshots/showcase-home.png" width="32%" alt="Autotech home with Anime, Movies, Manga, and TV Series libraries">
+  <img src="docs/screenshots/showcase-discover.png" width="32%" alt="Autotech Discover interface with filters and content results">
+  <img src="docs/screenshots/showcase-detail.png" width="32%" alt="Customized Jellyfin media detail experience">
 </div>
 
 ## What makes the project interesting
